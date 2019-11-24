@@ -1,0 +1,55 @@
+---
+Organizations:
+    - &OrdererOrg
+        Name: OrdererOrg
+        ID: OrdererMSP
+        MSPDir: crypto-config/ordererOrganizations/wangz.com/msp
+    - &FBI
+        Name: FBIMSP
+        ID: FBIMSP
+        MSPDir: crypto-config/peerOrganizations/fbi.wangz.com/msp
+        AnchorPeers:
+            - Host: peer0.fbi.wangz.com
+              Port: 7051
+Orderer: &OrdererDefaults
+    OrdererType: solo
+    Addresses:
+        - orderer.wangz.com:7050
+    BatchTimeout: 2s
+    BatchSize:
+        MaxMessageCount: 10
+        AbsoluteMaxBytes: 98 MB
+        PreferredMaxBytes: 512 KB
+    Organizations:
+Application: &ApplicationDefaults
+    Organizations:
+Capabilities:
+    Global: &ChannelCapabilities
+        V1_1: true
+    Orderer: &OrdererCapabilities
+        V1_1: true
+    Application: &ApplicationCapabilities
+        V1_1: true
+Profiles:
+
+    WangzGenesis:
+        Capabilities:
+            <<: *ChannelCapabilities
+        Orderer:
+            <<: *OrdererDefaults
+            Organizations:
+                - *OrdererOrg
+            Capabilities:
+                <<: *OrdererCapabilities
+        Consortiums:
+            SampleConsortium:
+                Organizations:
+                    - *FBI
+    WangzChannel:
+        Consortium: SampleConsortium
+        Application:
+            <<: *ApplicationDefaults
+            Organizations:
+                - *FBI
+            Capabilities:
+                <<: *ApplicationCapabilities
